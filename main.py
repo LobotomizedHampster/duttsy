@@ -3,17 +3,19 @@
 #    [ ] allow to unlink files/folders
 #    [ ] conflict management
 #    [ ] pass arguments
-#        [ ] -d / --delete  |  delete the symlink, then move the file/folder back
-#        [ ] -h / --help    |  print help info
+#        [/] -d / --delete  |  delete the symlink, then move the file/folder back
+#        [/] -h / --help    |  print help info
 #        [ ] -ei / --edit-ignore  |  edit ignore file
 #        [ ]    / null      |  refresh the dotfile folder
 #    [ ] docmentation
 #    [ ] print help txt from file
 #    [ ] name prgm (dottle, dotty/dottie, dottsy/dottsie)
 #    [ ] add folder support for .dotty-ignore
+#    [ ] user error handling
 from pathlib import Path
 import os
 import argparse
+import shutil
 
 # source path (where the files will be)
 source_root = Path.home() / ".dotfiles-test"
@@ -28,7 +30,7 @@ parser.add_argument("--edit-ignore", "-ei", action="store_true")
 parser.add_argument("--help", "-h", action="store_true")
 
 # create positional arguments
-parser.add_argument("file")
+parser.add_argument("file", nargs="?", default=None)
 
 
 args = parser.parse_args() # parse arguments
@@ -82,7 +84,7 @@ def normal_flag():
     print("default mode enabled")
 
 
-
+# print the help message
 def help_flag():
     help_text = (
         "Commands available:\n\n"
@@ -91,56 +93,89 @@ def help_flag():
         "--edit-ignore -ei  edit .dotty-ignore")
     print(help_text)
 
-
+# this function does three things:
+# 1. delete the symlink.
+# 2. copy the file from .dotfiles to where the symlink was.
+# 3. perform an unholy amount of checks to ensure 1 and 2 succeed.
+#    checks include:
+#    - if the path is absolute (or begins with ~)
+#    - if the file exists in .dotfiles
+#    - if the target file is actually a symlink
+#    - if the target file is symlinked to the source file
 def delete_flag():
-    target = args.file
-    target_path = Path(target)
 
-    if target.startswith("~"): # expand "~" into "/home/user/"
-        deleted_file = target_path.expanduser()
+    # the file given by the user (the one in .dotfiles)
+    source = args.file
+    source_path = Path(source)
 
-    elif not target_path.is_absolute(): # if the path is relative
-        cwd = Path.cwd() # current directory
-        deleted_file = str(cwd / target)
-
-    else: # if the path is absolute
-        deleted_file = target
-
-    # source path (where the files will be)
+    # source root dir
     source_root = Path.home() / ".dotfiles-test"
 
+    # check if the path is absolute (should be relative)
+    if source.startswith("~") or source_path.is_absolute(): 
+        return
 
-    deleted_file = Path(deleted_file)
-    deleted_file = deleted_file.resolve() # normalizes path
+    
+    source_file = Path(source_root / source_path)
+    source_file = source_file.resolve() # normalizes path
 
-    # debug print
-    print("delete mode enabled, deleting:", deleted_file)
-    print("file type:", type(deleted_file))
+    # check that it exists in the .dotfile dir
+    if not source_file.exists():
 
-    # check if file is in the dotfile dir (failsafe)
-    if source_root in deleted_file.parents or deleted_file == target:
-        print("the file IS in", source_root)
-        # now i need to:
-        # [ ] should check if file is symlink
-        # [/] check if the file is symlinked to **the file we are unlinking**
-        # [ ] delete the symlink
-        # [ ] copy the file back to origanal place
-        # [ ] get the orignal string
-        deleted_path = list(deleted_file.parts)
-        parts
-        print("parts of the deleted file path:", list(deleted_file.parts))
-        #print("the symlink is in:", symlink_path)
+        # [ ] add folder support
+
+        # this is the var that is outside .dotfiles
+        # this calculates that (by removing the instance of the 
+        # .dotfile folder)
+        target_path = source_file.parts
+        target_path = [part for part in target_path
+                            if part != ".dotfiles-test"]
+        target_path = Path(*target_path)
+
+        # check if it is actually a symlink
+        if target_path.is_symlink():
+            print("and it is a symlink")
+
+            # check if the symlink actully points to the file we are deleting
+            if target_path.resolve() == source_file.resolve():
+                print("and it is symlinked to the right file")
+
+                # delete the symlink (target)
+                target_path.unlink(missing_ok=True)
+                
+                # copy the source file back to the target path
+                shutil.copy2(source_file, target_path)
 
     else:
         print("the file is NOT in", source_root)
 
 
+# check for arg after --delete flag
+if args.delete and args.file is None:
+    parser.error("the file argument is required when --delete is used")
 
-
-if args.delete: # check for delete flag
+# cheeck for --delete flag
+if args.delete:
     delete_flag()
 
 elif args.help: # check for help flag
     help_flag()
 else: # when no args are supplied (default behavior)
     normal_flag()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
