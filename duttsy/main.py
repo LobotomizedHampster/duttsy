@@ -70,9 +70,7 @@ def main():
             
                 if not path.is_file(): # checks if it is a file (no folders)
                     continue
-                if not path.is_symlink(): # checks if it is a symlink
-                    print(f"{path} IS A SYMLINK"
-            
+
                 # the path of the file without $HOME
                 relative = path.relative_to(source_root)
             
@@ -82,12 +80,20 @@ def main():
             
                 # the path of the file to symlink
                 target = target_root / relative
+
+                # prevents symlinking to itself
+                if path.resolve() == target.resolve(): 
+                    continue
+
             
                 # makes the directory path for the file
                 target.parent.mkdir(parents=True, exist_ok=True)
             
-                # deletes the target file if it exists or is a symlink
+                # checks if target file if it exists or is a symlink
                 if target.exists() or target.is_symlink():
+
+                    # checks if the files are the same, moves them to a special
+                    # directory if not
                     if not target.read_bytes() == path.read_bytes():
                         print(f"WARNING:\n"
                               f"  {target}\n"
@@ -99,8 +105,11 @@ def main():
                         overwritten_path.mkdir(parents=True, exist_ok=True)
                         shutil.copy2(target, overwritten_target)
     
-                        #continue
                     target.unlink()
+
+                # prevents symlinking to itself
+                if path.resolve() == target.resolve(): 
+                    continue
             
                 # path of the target without specifying $HOME
                 rel_target = os.path.relpath(path, start=target.parent)
@@ -108,6 +117,9 @@ def main():
                 # symlink the target using the relative string
                 target.symlink_to(rel_target)
         
+                print(path.resolve())
+                print(target.resolve())
+
         
         
         
@@ -218,3 +230,4 @@ def main():
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
+main()
