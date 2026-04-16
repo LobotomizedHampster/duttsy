@@ -70,6 +70,8 @@ def main():
             
                 if not path.is_file(): # checks if it is a file (no folders)
                     continue
+                if not path.is_symlink(): # checks if it is a symlink
+                    print(f"{path} IS A SYMLINK"
             
                 # the path of the file without $HOME
                 relative = path.relative_to(source_root)
