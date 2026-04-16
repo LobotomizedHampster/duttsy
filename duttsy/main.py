@@ -38,9 +38,6 @@ def main():
         
             print("normal flag selected")
         
-            # ignore file (inside source path)
-            ignore_file = source_root / ".dotty-ignore"
-        
             # convert lines in ignore file into a set
             ignored = set(line.strip()
                 for line in ignore_file.read_text().splitlines()
