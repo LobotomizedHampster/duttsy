@@ -7,7 +7,7 @@ import sys
 def main():
     def all_code():
         # source path (where the files will be)
-        dotfile_folder = ".dotfiles-test"
+        dotfile_folder = ".dotfiles"
         source_root = Path.home() / dotfile_folder
         
         # target path (where the file will be gotten from)
@@ -15,6 +15,9 @@ def main():
     
         # folder for overwritten files
         overwritten_path = source_root / ".overwritten"
+
+        # ignore file (inside source path)
+        ignore_file = source_root / ".duttsy-ignore"
         
         
         # enable argument parser (without abbreviations)
