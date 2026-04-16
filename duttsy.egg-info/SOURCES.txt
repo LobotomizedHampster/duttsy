@@ -1,3 +1,4 @@
+README.md
 pyproject.toml
 duttsy/main.py
 duttsy.egg-info/PKG-INFO
