@@ -1,3 +1,6 @@
 Metadata-Version: 2.4
 Name: duttsy
 Version: 0.1.0
+Summary: very simple dotfile mamager based on stow
+Author: Lobotomized Hampster
+Requires-Python: >=3.10
