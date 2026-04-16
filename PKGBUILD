@@ -12,6 +12,7 @@ source=("git+$url.git")
 sha256sums=('SKIP')
 
 build() {
+    echo "srcdir is: $srcdir"
     cd "$srcdir/$pkgname"
     python -m build --wheel --no-isolation
 }
