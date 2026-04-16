@@ -1,8 +1,0 @@
-README.md
-pyproject.toml
-duttsy/main.py
-duttsy.egg-info/PKG-INFO
-duttsy.egg-info/SOURCES.txt
-duttsy.egg-info/dependency_links.txt
-duttsy.egg-info/entry_points.txt
-duttsy.egg-info/top_level.txt

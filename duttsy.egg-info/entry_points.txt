@@ -1,2 +1,0 @@
-[console_scripts]
-duttsy = duttsy.main:main
