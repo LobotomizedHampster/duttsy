@@ -36,7 +36,7 @@ def main():
     
         def normal_flag():
         
-            print("normal flag selected")
+            print("normal mode running")
         
             # convert lines in ignore file into a set
             ignored = set(line.strip()
@@ -117,9 +117,6 @@ def main():
                 # symlink the target using the relative string
                 target.symlink_to(rel_target)
         
-                print(path.resolve())
-                print(target.resolve())
-
         
         
         
@@ -161,6 +158,7 @@ def main():
         
             source_path = Path(source_root / source_path)
             source_path = source_path.resolve() # normalizes path
+            print("running in delete mode. deleting: ", source_path)
         
             # check that it exists in the .dotfile dir
             if not source_path.exists():
@@ -195,7 +193,6 @@ def main():
         
             # check if a dir
             if source_path.is_dir():
-                print("is a dir")
         
                 # recuseively loop through each file/subdirectory in a directory
                 for path in source_path.rglob("*"):
